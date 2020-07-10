@@ -6,7 +6,7 @@
 
 
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, render_template_string,request, url_for
 from flask_sqlalchemy import SQLAlchemy
 import time
 from time import strftime, strptime, mktime
@@ -14,6 +14,7 @@ import datetime
 from datetime import timedelta
 import random
 import smtplib
+from PIL import Image
 
 from email.message import EmailMessage
 
@@ -49,7 +50,7 @@ class Prediction(db.Model):
 prediction=[]
 @app.route('/', methods=["GET", "POST"])
 def index():
-    returnrender_template("main.html")
+    return render_template("main.html")
 
     if request.method == "GET":
         return render_template("main_page.html")
@@ -74,6 +75,27 @@ def index():
 
     return redirect(url_for('pred',prednumber=pred_code))
 
+@app.route('/test', methods=["GET", "POST"])
+def test():
+    unfurldata='''
+<!-— facebook open graph tags -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://https://showgig.pythonanywhere.com/test" />
+<meta property="og:title" content="test gig display with unfurl" />
+<meta property="og:description" content="the some text words.<BR>and here a line break?<b>bold</b>" />
+<meta property="og:image" content="https://showgig.pythonanywhere.com/static/combo_1.png" />
+
+    
+    '''
+    img1='<img src="'+url_for('static',filename="examplechart.png")+'" alt="no img1">'
+    img2='<img src="'+url_for('static',filename="examplemap.png")+'" alt="no img2">'
+    files=['/home/showgig/mysite'+url_for('static',filename='examplemap.png'),'/home/showgig/mysite'+url_for('static',filename='examplechart.png')]
+    images = list(map(Image.open, files))
+
+    combo_1 = append_images(images, direction='horizontal')
+    combo_1.save('/home/showgig/mysite'+url_for('static',filename='combo_1.png'))
+    return render_template_string('<html>'+unfurldata+'<div>some text</div>'+img1+img2+'</html>')
+
 @app.route('/gig/<gignumber>', methods=["GET", "POST"])
 def gig(gignumber):
     if request.method == "GET":
@@ -85,3 +107,55 @@ def gig(gignumber):
         print("no such pred",prednumber)
         return render_template("no_such_pred.html",missing_pred=prednumber)
 
+
+
+
+def append_images(images, direction='horizontal',
+                  bg_color=(255,255,255), aligment='center'):
+    """
+    Appends images in horizontal/vertical direction.
+
+    Args:
+        images: List of PIL images
+        direction: direction of concatenation, 'horizontal' or 'vertical'
+        bg_color: Background color (default: white)
+        aligment: alignment mode if images need padding;
+           'left', 'right', 'top', 'bottom', or 'center'
+
+    Returns:
+        Concatenated image as a new PIL image object.
+    """
+    widths, heights = zip(*(i.size for i in images))
+
+    if direction=='horizontal':
+        new_width = sum(widths)
+        new_height = max(heights)
+    else:
+        new_width = max(widths)
+        new_height = sum(heights)
+    print(widths, heights,new_width,new_height)
+    new_im = Image.new('RGB', (new_width, new_height), color=bg_color)
+
+
+    offset = 0
+    for im in images:
+        if direction=='horizontal':
+            y = 0
+            if aligment == 'center':
+                y = int((new_height - im.size[1])/2)
+            elif aligment == 'bottom':
+                y = new_height - im.size[1]
+            print(offset,y)
+            new_im.paste(im, (offset, y))
+            offset += im.size[0]
+        else:
+            x = 0
+            if aligment == 'center':
+                x = int((new_width - im.size[0])/2)
+            elif aligment == 'right':
+                x = new_width - im.size[0]
+            new_im.paste(im, (x, offset))
+            offset += im.size[1]
+    new_im=new_im.resize((200,100),Image.LANCZOS)
+
+    return new_im
