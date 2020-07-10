@@ -1,0 +1,23 @@
+how to show a gig
+*spider chart based on:
+time duration (assume all are immediate)
+intensity
+reliability& consistency of gig (volatility?)
+management
+s/w
+words
+visual
+work/talk balance
+-what else do you look for in a gig?
+
+*map of country with blob of the size of relevent area (can be whole world). but how will we recognize. also, whole world shows whole world. so maybe we show a map and on the map a circle.
+->how about user can decide on size of map cenetered on his click-location and can also choose size of click location (e.g., in km). as always, each click is a factor of 2 or 4, starting from 10km
+*keywords (up to six?), like sql, spss, blockchain, etc.
+*free text
+
+how to make that show
+*have a web page where one enters the data and gets a gig number (like knewit), that has as an image the image and the keywords and the text
+
+how to show what one is looking for? can be the same
+
+downside - no spirit, all technical details. but still
