@@ -1,24 +1,21 @@
 
-# reusing teh bones of prediction box
+# reusing the bones of knewit to build a system that generates gig pages
 #
-#e
+
 
 
 
 
 from flask import Flask, redirect, render_template, render_template_string,request, url_for
 from flask_sqlalchemy import SQLAlchemy
-import time
-from time import strftime, strptime, mktime
+
 import datetime
 from datetime import timedelta
 import random
-import smtplib
+
+import os
 from PIL import Image
-
-from email.message import EmailMessage
-
-
+import re
 
 app = Flask(__name__)
 app.config["DEBUG"] = True
@@ -34,78 +31,54 @@ app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
+preamble='/home/showgig/mysite' # should probbaly be in app.config[]
+
+class Gigs(db.Model):
+
+    __tablename__ = "gigs"
+
+    id = db.Column(db.Integer, primary_key=True) # at this time, map and spider are created on java, so we only store the images, not underlying parameters
+    body = db.Column(db.String(4096)) #for now, keywords are inline, so no need to save seperatly
+    title = db.Column(db.String(100)) #for now, images have a fixed name based on gignumber + map; +spider. so no need to save either
+    created_at=db.Column(db.TIMESTAMP)
+    other = db.Column(db.String(4096)) #random other data
 
 
-class Prediction(db.Model):
-
-    __tablename__ = "predictions"
-
-    id = db.Column(db.Integer, primary_key=True)
-    pred = db.Column(db.String(4096))
-    cert = db.Column(db.String(100))
-    expose_date=db.Column(db.DateTime)
-    entry_time=db.Column(db.TIMESTAMP, onupdate=datetime.datetime.now())
-    pred_code=db.Column(db.Integer)
-
-prediction=[]
-@app.route('/', methods=["GET", "POST"])
+@app.route('/', methods=["GET"])
 def index():
     return render_template("main.html")
 
-    if request.method == "GET":
-        return render_template("main_page.html")
-    if request.form["prediction"]=="":
-        return render_template("main_page.html", wasmissing=1)
-    pred_code=int(time.time())+random.randint(0,100000)
-    datetouse=request.form["expose_date"] or datetime.datetime.now() #need to correct back for timezone change
-    td=timedelta(minutes=int(request.form["timediff"]))
-    lt=datetime.datetime.strptime(request.form["expose_date"],"%Y-%m-%dT%H:%M")
-    print("lt",lt)
-    print("td",td)
-    print(lt+td)
-    nt=lt+td
-    print(request.form["expose_date"],request.form["timediff"], nt.strftime("%Y-%m-%dT%H:%M"))
-
-
-    c = Prediction(pred=request.form["prediction"], expose_date=nt,pred_code=pred_code, entry_time=datetime.datetime.utcnow())
+@app.route('/makeagig', methods=["POST"])
+def makeagig():
+    c = Gigs(body=request.form["body"],title=request.form["title"],other="")
+    print("made c:",c)
+    files = request.files.getlist("file")
     db.session.add(c)
     db.session.commit()
+    gignum=c.id
+    print(gignum, files)
+    for file in files:
+        file.save(preamble, str(gignum)+file.filename)
+        print("filename being saved:",file.filename)
+    print("will now redirect")
+    return redirect('/gig/'+str(gignum))
 
-
-
-    return redirect(url_for('pred',prednumber=pred_code))
-
-@app.route('/test', methods=["GET", "POST"])
-def test():
-    unfurldata='''
-<!-— facebook open graph tags -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://https://showgig.pythonanywhere.com/test" />
-<meta property="og:title" content="test gig display with unfurl" />
-<meta property="og:description" content="the some text words.<BR>and here a line break?<b>bold</b>" />
-<meta property="og:image" content="https://showgig.pythonanywhere.com/static/combo_1.png" />
-
-    
-    '''
-    img1='<img src="'+url_for('static',filename="examplechart.png")+'" alt="no img1">'
-    img2='<img src="'+url_for('static',filename="examplemap.png")+'" alt="no img2">'
-    files=['/home/showgig/mysite'+url_for('static',filename='examplemap.png'),'/home/showgig/mysite'+url_for('static',filename='examplechart.png')]
-    images = list(map(Image.open, files))
-
-    combo_1 = append_images(images, direction='horizontal')
-    combo_1.save('/home/showgig/mysite'+url_for('static',filename='combo_1.png'))
-    return render_template_string('<html>'+unfurldata+'<div>some text</div>'+img1+img2+'</html>')
-
-@app.route('/gig/<gignumber>', methods=["GET", "POST"])
+@app.route('/gig/<gignumber>', methods=["GET"])
 def gig(gignumber):
     if request.method == "GET":
-#        print("before query",prednumber)
-        prediction=Prediction.query.filter(Prediction.pred_code == prednumber).first()
-#        print("after query",prediction)
-        if(prediction):
-            return render_template("pred_page.html", prediction=prediction, instant=datetime.datetime.utcnow()) #prednumber=prediction.pred_code, #seems to fail here!
-        print("no such pred",prednumber)
-        return render_template("no_such_pred.html",missing_pred=prednumber)
+        gig=Gigs.query.filter_by(id = int(gignumber)).first()
+        if(gig):
+            spiderloc=url_for('static',filename=str(gig.id)+"spider"+".png")
+            maploc=url_for('static',filename=str(gig.id)+"map"+".png")
+            comboloc=url_for('static',filename=str(gig.id)+"combo"+".png")
+            print(spiderloc,maploc,comboloc);
+            if not os.path.exists(preamble+comboloc):
+                files=[preamble+spiderloc,preamble+maploc]
+                images = list(map(Image.open, files))
+                combo_1 = append_images(images, direction='horizontal')
+                combo_1.save(preamble+comboloc)
+            return render_template("gig.html", gig=gig.id, comboloc=comboloc,spiderloc=spiderloc,maploc=maploc,title=gig.title, text=gig.body, words=" ".join(getkeywords(gig.body))) 
+        return render_template_string("no_such_gig #"+str(gig))
 
 
 
@@ -159,3 +132,5 @@ def append_images(images, direction='horizontal',
     new_im=new_im.resize((200,100),Image.LANCZOS)
 
     return new_im
+def getkeywords(txt): #return keywords, without hashsign
+    return [word[1:] for word in filter(None, re.split("[, !?:;]+", txt)) if word.startswith("#")]
