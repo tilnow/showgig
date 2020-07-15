@@ -15,18 +15,17 @@
 <p>
 the idea is to try and optimize a display of available gigs based on two assumptions:
 <br>
-1. gig lookers are intersted in particular types of information (hope i got them right...)
+1. gig lookers from the yak collective are interested in particular types of information (hope i got them right... pls advise)
 <br>
-2. a graphical display helps expose some of the data in a way that is easy for a gig searcher to assimilate and use for fast filtering <br>
-
-at thsi time, i do not have a good model for "looking for a gig" entries<br>
+2. a graphical display helps expose some of the information in a way that is easy for a gig searcher to assimilate and use for fast filtering <br>
+*at this time, i do not have a good model for "looking for a gig" entries<br>
 <br>
 </p>
 <p>
 how to use?<br>
-in map select a map size peopel can regognize and mark teh approximate geoegraphical region where gig-takers may reasonably come from. you can minimize the map to cover the entire world, too.<br>
+in map select a map size people can recognize and mark the approximate geographical region where gig-takers may reasonably come from. you can minimize the map to cover the entire world, too.<br>
 use sliders to select the relative amount of each of the properties of the gig<br>
-write a short decsription of the gig. use hashmarks ("#') to indicate keywords that should stand out. it is not unreasonable to expect that text in html will be treated as html (at least in future).<br>
+write a short decsription of the gig. use hashmarks ("#") to indicate keywords that should stand out. it is not unreasonable to expect that text in html will be treated as html (at least in future, but not in unfurl view).<br>
 </p>
 
 <p>
@@ -39,37 +38,94 @@ i am not implementing editing, logging in etc., as this is not a production syst
 
 
 </p>
+<p><b>time considerations</b></p><br>
+<label for="param_0">duration; low to high:</label>
+<input type="range" id="param_6" name="points" min="0" max="10"><br>
+<label for="param_1">intensity; low to high:</label>
+<input type="range" id="param_7" name="points" min="0" max="10"><br>
+<br>
+<p><b>style considerations</b></p><br>
+<label for="param_2">effort volatility; low to high:</label>
+<input type="range" id="param_0" name="points" min="0" max="10"><br>
+<label for="param_3">work vs. talk balance:</label>
+<input type="range" id="param_1" name="points" min="0" max="10"><br>
+<br><p><b>subject matter considerations</b> (i only mean to cover most common skill sets looked for)</p><br>
+<label for="param_4">software:</label>
+<input type="range" id="param_2" name="points" min="0" max="10"><br>
+<label for="param_5">words:</label>
+<input type="range" id="param_3" name="points" min="0" max="10"><br>
+<label for="param_6">management:</label>
+<input type="range" id="param_4" name="points" min="0" max="10"><br>
+<label for="param_7">visual:</label>
+<input type="range" id="param_5" name="points" min="0" max="10"><br>
+<script>
+function slider_onchange(){
+    v=this.value;
+    n=this.id.split("_")[1];
+    myRadarChart.data.datasets[0].data[n]=v;
+    myRadarChart.update();
+}
+for (let i = 0; i < 8; i++){
+document.getElementById("param_"+i.toString()).onchange=slider_onchange;
+}
+function done(){  
+spider_url=myRadarChart.toBase64Image();
+}
+data= {
+    labels: [ 'StD', 'talk','s/w','words','mangment','visual','duration', '%week'],
+    datasets: [{
+        label:"lets try to hide this",
+        data: [9, 10, 4, 2 , 10, 5,8,9],
+        borderColor: "red",
+        fill: false
+        
+    }]
+}
+options = {
+  animation: {
+    onComplete: done,
+  },
+    legend:{
+        display: false,
+    },
+    scale: {
+        angleLines: {
+            display: false
+        },
+    pointLabels:{
+        display: true //lets play with this
+    },
+        ticks: {
+            display:false,
+            suggestedMin: 1,
+            suggestedMax: 11
+        }
+    }
+};
+</script>
+<p><b>This radar chart graphically illustrates the above selected parameters</b></p><br>
+<div class="chart-container" style="position: relative; height:400px; width:600px">
+<canvas id="myChart"></canvas>
+</div>
 
-<button id="makeagig" >make a gig</button><br>
-title:<textarea id="title" name="title" rows="1" placeholder="title"></textarea><br>
-body:<textarea id="body" name="body" rows="7" placeholder="description of gig"></textarea><br>
+title:<textarea id="title" name="title" rows="1" cols="100" placeholder="brief title"></textarea><br>
+body:<textarea id="body" name="body" rows="7" cols="100" placeholder="description of gig, add #hashtags to keywords"></textarea><br>
 
     <div id="map" class="map"></div>
-    <button id="export-png" class="btn btn-default"><i class="fa fa-download"></i> Download PNG</button>
-    <a id="image-download" download="map.png"></a>
         <form class="form-inline">
       <label>Shape type &nbsp;</label>
       <select id="type">
         <option value="Circle">Circle</option>
         <option value="Square">Square</option>
         <option value="Box">Box</option>
-        <option value="Star">Star</option>
         <option value="None">None</option>
       </select>
     </form>
-
+    <button id="makeagig" >please post my gig</button><br>
     <script type="text/javascript">
-/*    import 'ol/ol.css';
-import Map from 'ol/Map';
-import View from 'ol/View';
-import Polygon from 'ol/geom/Polygon';
-import Draw, {createRegularPolygon, createBox} from 'ol/interaction/Draw';
-import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer';
-import {OSM, Vector as VectorSource} from 'ol/source';
-*/
+
     
-    
-    var raster = new ol.layer.Tile({
+var raster = new ol.layer.Tile({
   source: new ol.source.OSM()
 });
 
@@ -101,33 +157,7 @@ function addInteraction() {
     } else if (value === 'Box') {
       value = 'Circle';
       geometryFunction = createBox();
-    } else if (value === 'Star') {
-      value = 'Circle';
-      geometryFunction = function(coordinates, geometry) {
-        var center = coordinates[0];
-        var last = coordinates[1];
-        var dx = center[0] - last[0];
-        var dy = center[1] - last[1];
-        var radius = Math.sqrt(dx * dx + dy * dy);
-        var rotation = Math.atan2(dy, dx);
-        var newCoordinates = [];
-        var numPoints = 12;
-        for (var i = 0; i < numPoints; ++i) {
-          var angle = rotation + i * 2 * Math.PI / numPoints;
-          var fraction = i % 2 === 0 ? 1 : 0.5;
-          var offsetX = radius * fraction * Math.cos(angle);
-          var offsetY = radius * fraction * Math.sin(angle);
-          newCoordinates.push([center[0] + offsetX, center[1] + offsetY]);
-        }
-        newCoordinates.push(newCoordinates[0].slice());
-        if (!geometry) {
-          geometry = new Polygon([newCoordinates]);
-        } else {
-          geometry.setCoordinates([newCoordinates]);
-        }
-        return geometry;
-      };
-    }
+    } 
     draw = new ol.interaction.Draw({
       source: source,
       type: value,
@@ -149,53 +179,14 @@ typeSelect.onchange = function() {
 addInteraction();
 
     </script>
-<!---<img 
-    src="world.svg" 
-    alt="the map"
-    height="200"
-    width="200" />
-    -->
-    <!--<iframe src="world.svg" width="500" height="500" sandbox>
- 
-</iframe>-->
-<!--<a id="download-link">here</a>-->
-<canvas id="myChart" width="10000" height="10000" style="width: 1000px;height:1000px;"></canvas>
+
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
 var cnv=document.getElementById('myChart');
 var ctx = cnv.getContext('2d');
+//for images see https://stackoverflow.com/questions/36979474/how-to-change-the-labels-to-the-image-icon-in-bar-chart-js
 
-data= {
-    labels: ['Running', 'Swimming', 'Eating', 'Cycling'],
-    datasets: [{
-        label:"lets try to hide this",
-        data: [20, 10, 4, 2],
-        borderColor: "red",
-        fill: false
-        
-    }]
-}
-options = {
-  animation: {
-    onComplete: done
-  },
-    legend:{
-        display: false,
-    },
-    scale: {
-        angleLines: {
-            display: false
-        },
-    pointLabels:{
-        display: false
-    },
-        ticks: {
-            display:false,
-            suggestedMin: 10,
-            suggestedMax: 30
-        }
-    }
-};
 var myRadarChart = new Chart(ctx, {
     type: 'radar',
     data: data,
@@ -206,13 +197,10 @@ var myRadarChart = new Chart(ctx, {
 //cnv.style.width="100px";
 var spider_url,map_url;
 
-function done(){  
-spider_url=myRadarChart.toBase64Image();
-}
-document.getElementById('export-png').addEventListener('click', generate_map_url());
 
-function generate_map_url() {
-  map.once('rendercomplete', function() {
+
+function posting() {
+  map.once('rendercomplete', async function() {
     var mapCanvas = document.createElement('canvas');
     var size = map.getSize();
     mapCanvas.width = size[0];
@@ -231,39 +219,31 @@ function generate_map_url() {
       }
     });
     
-      map_url = mapCanvas.toDataURL();
-      return map_url
-  });
-  map.renderSync();
-  
-}
-
-async function makeagig()
-{
-
+      map_url = mapCanvas.toDataURL();//we are assuming that by now teh chart finished drawing and generating image file. it is a race condition
     var formData = new FormData();
     //for now allow map url to be generated manually, spider url is probably generated automatically
     let map_file = await fetch(map_url).then(r => r.blob()).then(blobFile => new File([blobFile], "map.png", { type: "image/png" }));
     let spider_file = await fetch(spider_url).then(r => r.blob()).then(blobFile => new File([blobFile], "spider.png", { type: "image/png" }));
-  files=[map_file,spider_file];
-  console.log(files)
-  files.map((file, index) => {
-    formData.append(`file${index}`, file);
-  });
-  
+
+  formData.append('map_file', map_file);
+  formData.append('spider_file', spider_file);
   formData.append('title', document.getElementById("title").value);
   formData.append('body', document.getElementById("body").value);
-for (var value of formData.values()) {
-   console.log(value);   
+
   fetch('/makeagig', {
     // content-type header should not be specified!
 
     method: 'POST',
     body: formData,
-  })
-
+  }).then(response=>{       if (response.redirected) {
+            window.location.href = response.url;
+        }}).catch(error=>alert(error));
+  });
+  map.renderSync();
+  
 }
-document.getElementById("makeagig").addEventListener("click",makeagig);
+
+document.getElementById("makeagig").addEventListener("click",posting);
 
 </script>
 

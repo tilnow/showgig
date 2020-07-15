@@ -53,12 +53,29 @@ def makeagig():
     c = Gigs(body=request.form["body"],title=request.form["title"],other="")
     print("made c:",c)
     files = request.files.getlist("file")
+    print(request.files)
+    try:
+        print(request.files['spider_file'])
+    except:
+        print("not file[0]")
+    try:
+        print(request.files['map_file'])
+    except:
+        print("not file['file1']")
+    files=[request.files['map_file'],request.files['spider_file']]
     db.session.add(c)
     db.session.commit()
     gignum=c.id
     print(gignum, files)
     for file in files:
-        file.save(preamble, str(gignum)+file.filename)
+        fname=preamble+url_for('static',filename=str(gignum)+file.filename)
+        file.save(fname)
+        f=Image.open(fname)
+        if file.filename=='spider.png':
+            w,h=f.size
+            f=f.crop(box=(w/5,0,(w*4)/5,h))
+        f=f.resize((300,300),Image.LANCZOS)
+        f.save(fname)
         print("filename being saved:",file.filename)
     print("will now redirect")
     return redirect('/gig/'+str(gignum))
@@ -77,7 +94,7 @@ def gig(gignumber):
                 images = list(map(Image.open, files))
                 combo_1 = append_images(images, direction='horizontal')
                 combo_1.save(preamble+comboloc)
-            return render_template("gig.html", gig=gig.id, comboloc=comboloc,spiderloc=spiderloc,maploc=maploc,title=gig.title, text=gig.body, words=" ".join(getkeywords(gig.body))) 
+            return render_template("gig.html", gig=gig.id, comboloc=comboloc,spiderloc=spiderloc,maploc=maploc,title=gig.title, text=gig.body.replace("#",""), words=" ".join(getkeywords(gig.body)) )
         return render_template_string("no_such_gig #"+str(gig))
 
 
@@ -129,8 +146,8 @@ def append_images(images, direction='horizontal',
                 x = new_width - im.size[0]
             new_im.paste(im, (x, offset))
             offset += im.size[1]
-    new_im=new_im.resize((200,100),Image.LANCZOS)
+    new_im=new_im.resize((400,200),Image.LANCZOS)
 
     return new_im
 def getkeywords(txt): #return keywords, without hashsign
-    return [word[1:] for word in filter(None, re.split("[, !?:;]+", txt)) if word.startswith("#")]
+    return [word[1:] for word in filter(None, re.split("[, !?:;\.]+", txt)) if word.startswith("#")]
