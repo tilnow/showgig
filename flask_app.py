@@ -50,7 +50,7 @@ def index():
 
 @app.route('/makeagig', methods=["POST"])
 def makeagig():
-    c = Gigs(body=request.form["body"],title=request.form["title"],other="")
+    c = Gigs(body=request.form["body"],title=request.form["title"],other=request.form["other"])
     print("made c:",c)
     files = request.files.getlist("file")
     print(request.files)
@@ -73,12 +73,31 @@ def makeagig():
         f=Image.open(fname)
         if file.filename=='spider.png':
             w,h=f.size
-            f=f.crop(box=(w/5,0,(w*4)/5,h))
+            f=f.crop(box=(w/7,0,(w*6)/7,h))
+            f=remove_transparency(f)
         f=f.resize((300,300),Image.LANCZOS)
         f.save(fname)
         print("filename being saved:",file.filename)
     print("will now redirect")
     return redirect('/gig/'+str(gignum))
+
+def remove_transparency(im, bg_colour=(255, 255, 255)):
+
+    # Only process if image has transparency (http://stackoverflow.com/a/1963146)
+    if im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info):
+
+        # Need to convert to RGBA if LA format due to a bug in PIL (http://stackoverflow.com/a/1963146)
+        alpha = im.convert('RGBA').split()[-1]
+
+        # Create a new background image of our matt color.
+        # Must be RGBA because paste requires both images have the same format
+        # (http://stackoverflow.com/a/8720632  and  http://stackoverflow.com/a/9459208)
+        bg = Image.new("RGBA", im.size, bg_colour + (255,))
+        bg.paste(im, mask=alpha)
+        return bg
+
+    else:
+        return im
 
 @app.route('/gig/<gignumber>', methods=["GET"])
 def gig(gignumber):
@@ -94,7 +113,7 @@ def gig(gignumber):
                 images = list(map(Image.open, files))
                 combo_1 = append_images(images, direction='horizontal')
                 combo_1.save(preamble+comboloc)
-            return render_template("gig.html", gig=gig.id, comboloc=comboloc,spiderloc=spiderloc,maploc=maploc,title=gig.title, text=gig.body.replace("#",""), words=" ".join(getkeywords(gig.body)) )
+            return render_template("gig.html", gig=gig.id, comboloc=comboloc,spiderloc=spiderloc,maploc=maploc,title=gig.title, text=gig.body.replace("#","").replace("\n","</p><p>"), words=" ".join(getkeywords(gig.body)),other=gig.other.replace("\n","</p><p>") )
         return render_template_string("no_such_gig #"+str(gig))
 
 

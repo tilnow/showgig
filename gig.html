@@ -21,8 +21,10 @@
 
 <img src="{{spiderloc}}" alt="no spider">
 <img src="{{maploc}}" alt="no map">
-<div id='title'>{{title}}</div>
-<div id='text'>{{text}}</div>
-<div id='keywords'><b>{{words}}</b></div>
-
+<div id='title'><h3>title</h3>{{title}}</div>
+<div id='text'><h3>description</h3><p>{{text | safe}}</p></div>
+<div id='other'><h3>other information</h3><p>{{other | safe}}</p></div>
+<div id='keywords'><h3>keywords</h3> <b>{{words}}</b></div>
+<br>
+<a href='/'>Home page of ShowGig</a>
 </html>

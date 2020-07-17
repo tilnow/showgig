@@ -12,52 +12,62 @@
   </head>
 
 <body>
-<p>
-the idea is to try and optimize a display of available gigs based on two assumptions:
-<br>
-1. gig lookers from the yak collective are interested in particular types of information (hope i got them right... pls advise)
-<br>
-2. a graphical display helps expose some of the information in a way that is easy for a gig searcher to assimilate and use for fast filtering <br>
-*at this time, i do not have a good model for "looking for a gig" entries<br>
-<br>
-</p>
-<p>
-how to use?<br>
-in map select a map size people can recognize and mark the approximate geographical region where gig-takers may reasonably come from. you can minimize the map to cover the entire world, too.<br>
-use sliders to select the relative amount of each of the properties of the gig<br>
-write a short decsription of the gig. use hashmarks ("#") to indicate keywords that should stand out. it is not unreasonable to expect that text in html will be treated as html (at least in future, but not in unfurl view).<br>
-</p>
 
+<h2> About</h2>
+<p>the idea is to try and optimize a display of available gigs based on three assumptions:</p>
+<ol>
+<li>gig lookers from the yak collective are interested in particular types of information (hope i got them right... <b>pls advise</b>).</li>
+<li>a graphical display helps expose some of the information in a way that is easy for a gig searcher to assimilate and use for fast filtering.</li> 
+<li>yaks are international. so are some gigs. the map helps a yak see if the gig is in their area and/or international.</li>
+</ol>
+<p>*at this time, i do not have a good model for "looking for a gig" entries</p>
+
+
+<h2>logic of demo</h2>
 <p>
-logic:<br>
-on this page you may enter a gig<br>
-once posted, it gets a gig number and a dedicated page/link<br>
-each gig also has an unfurl format, which includes the graphics, the keywords and the description<br>
+on this page you may define a gig.<br>
+once posted, you get a dedicated gig page and a gig number. you can copy the link. <br>
+each gig also has an unfurl format, which includes the graphics, the keywords and the description.<br>
+this means the gist of the gig will appear in discord messages and probably also other messaging tools.<br>
 someday there will be a page for seeing a list of the gigs<br>
-i am not implementing editing, logging in etc., as this is not a production system, just a demo of the display<br>
-
+<b>caveat: </b>remember this is still a demo. nothing too reliable.<br>
+also, i am not implementing editing, additional data fields, logging in etc., as this is not a production system.<br>
+<b>this is a demo, so please give feedback! either on discord channel #take-gig-leave-gig</b> or by email: <a href="mailto:showgig@fensterfamily.net">showgig@fensterfamily.net</a><br>
 
 </p>
-<p><b>time considerations</b></p><br>
-<label for="param_0">duration; low to high:</label>
-<input type="range" id="param_6" name="points" min="0" max="10"><br>
-<label for="param_1">intensity; low to high:</label>
-<input type="range" id="param_7" name="points" min="0" max="10"><br>
-<br>
-<p><b>style considerations</b></p><br>
-<label for="param_2">effort volatility; low to high:</label>
-<input type="range" id="param_0" name="points" min="0" max="10"><br>
-<label for="param_3">work vs. talk balance:</label>
-<input type="range" id="param_1" name="points" min="0" max="10"><br>
-<br><p><b>subject matter considerations</b> (i only mean to cover most common skill sets looked for)</p><br>
-<label for="param_4">software:</label>
-<input type="range" id="param_2" name="points" min="0" max="10"><br>
-<label for="param_5">words:</label>
-<input type="range" id="param_3" name="points" min="0" max="10"><br>
-<label for="param_6">management:</label>
-<input type="range" id="param_4" name="points" min="0" max="10"><br>
-<label for="param_7">visual:</label>
-<input type="range" id="param_5" name="points" min="0" max="10"><br>
+
+<h2>how to use?</h2>
+
+<ul>
+<li>use <u>sliders</u> to select the relative amount of each of the properties of the gig.</li>
+<li>view results in the <u>spider chart</u> display.</li>
+<li>give the gig a short <u>title</u>.</li>
+<li>write a short <u>description</u> of the gig. use hashmarks ("#") to indicate keywords that should stand out. these hashmarks will be removed when viewing.</li>
+<li>in <u>map</u> select a map size people can recognize and mark the approximate geographical region where gig-takers may reasonably come from. you can zoom out the map to cover the entire world, too.</li>
+<li>click on <u>please post my gig</u> button.</li>
+</ul>
+
+<h2>the gig maker</h2>
+
+<h3>time considerations</h3>
+<label for="param_7">duration; low to high:</label>
+<input type="range" id="param_7" name="points" min="0" max="10"><span id="img_7"></span><br>
+<label for="param_0">intensity; low to high:</label>
+<input type="range" id="param_0" name="points" min="0" max="10"><span id="img_0"></span><br>
+<h3>style considerations</h3>
+<label for="param_1">effort volatility; low to high:</label>
+<input type="range" id="param_1" name="points" min="0" max="10"><span id="img_1"></span><br>
+<label for="param_2">work vs. talk balance:</label>
+<input type="range" id="param_2" name="points" min="0" max="10"><span id="img_2"></span>
+<h3>subject matter considerations</h3> (i only mean to cover most common skill sets looked for)</p><br>
+<label for="param_3">software:</label>
+<input type="range" id="param_3" name="points" min="0" max="10"><span id="img_3"></span><br>
+<label for="param_4">words:</label>
+<input type="range" id="param_4" name="points" min="0" max="10"><span id="img_4"></span><br>
+<label for="param_5">management:</label>
+<input type="range" id="param_5" name="points" min="0" max="10"><span id="img_5"></span><br>
+<label for="param_6">visual:</label>
+<input type="range" id="param_6" name="points" min="0" max="10"><span id="img_6"></span><br>
 <script>
 function slider_onchange(){
     v=this.value;
@@ -68,20 +78,64 @@ function slider_onchange(){
 for (let i = 0; i < 8; i++){
 document.getElementById("param_"+i.toString()).onchange=slider_onchange;
 }
+
 function done(){  
 spider_url=myRadarChart.toBase64Image();
 }
+var i_names=['i_intensity.png','i_volatility.png','i_talk.png','i_code.png','i_words.jpg','i_manager.png','i_eye.png','i_duration.png'];
+var icon_images=[];
+var n;
+i_names.forEach(function(item,index){
+    n=new Image(45,45);
+    n.src='/static/'+item;
+    icon_images.push(n)
+    old=document.getElementById("img_"+index.toString());
+    old.parentNode.replaceChild(n,old);
+});
+
+/*Chart.pluginService.register({
+    beforeDraw: function (chart, easing) {
+        if (chart.config.options.chartArea && chart.config.options.chartArea.backgroundColor) {
+            var ctx = chart.chart.ctx;
+            var chartArea = chart.chartArea;
+
+            ctx.save();
+            ctx.fillStyle = chart.config.options.chartArea.backgroundColor;
+            ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+            ctx.restore();
+        }
+    }
+});*/
+
 data= {
-    labels: [ 'StD', 'talk','s/w','words','mangment','visual','duration', '%week'],
+    labels: [ '%week', 'volatility', 'talk','s/w','words','management','visual','duration'],
     datasets: [{
-        label:"lets try to hide this",
+        label:"value:",
         data: [9, 10, 4, 2 , 10, 5,8,9],
         borderColor: "red",
         fill: false
         
+    },{
+        label:"",
+        data: [11,11,11,11,11,11,11,11],
+        pointStyle: icon_images,
+        borderColor: "white",
+        fill: false
+
     }]
 }
 options = {
+  responsive: true,
+  maintainAspectRatio: false,
+  tooltips:{enabled: false,},
+  layout: {
+    padding: {
+        left: 0,
+        right: 0,
+        top: 30,
+        bottom: 30
+    }
+  },
   animation: {
     onComplete: done,
   },
@@ -93,11 +147,12 @@ options = {
             display: false
         },
     pointLabels:{
-        display: true //lets play with this
+        display: false, //lets play with this - now as images
+        fontSize: 18,
     },
         ticks: {
             display:false,
-            suggestedMin: 1,
+            suggestedMin: 0,
             suggestedMax: 11
         }
     }
@@ -107,13 +162,14 @@ options = {
 <div class="chart-container" style="position: relative; height:400px; width:600px">
 <canvas id="myChart"></canvas>
 </div>
-
-title:<textarea id="title" name="title" rows="1" cols="100" placeholder="brief title"></textarea><br>
-body:<textarea id="body" name="body" rows="7" cols="100" placeholder="description of gig, add #hashtags to keywords"></textarea><br>
-
+<h3>here you can enter text</h3>
+title:<textarea id="title" name="title" rows="1" cols="50" placeholder="brief title"></textarea><br>
+desc:<textarea id="body" name="body" rows="7" cols="50" placeholder="description of gig, add #hashtags to keywords"></textarea><br>
+other:<textarea id="other" name="other" rows="7" cols="50" placeholder="any other information you want to add, like contact info"></textarea><br>
+<h3> here is the map</h3>
     <div id="map" class="map"></div>
         <form class="form-inline">
-      <label>Shape type &nbsp;</label>
+      <label>Shape type &nbsp;</label> <!--thanks https://openlayers.org/en/latest/examples/draw-shapes.html-->
       <select id="type">
         <option value="Circle">Circle</option>
         <option value="Square">Square</option>
@@ -153,10 +209,10 @@ function addInteraction() {
     var geometryFunction;
     if (value === 'Square') {
       value = 'Circle';
-      geometryFunction = createRegularPolygon(4);
+      geometryFunction = ol.interaction.Draw.createRegularPolygon(4);
     } else if (value === 'Box') {
       value = 'Circle';
-      geometryFunction = createBox();
+      geometryFunction = ol.interaction.Draw.createBox();
     } 
     draw = new ol.interaction.Draw({
       source: source,
@@ -192,6 +248,9 @@ var myRadarChart = new Chart(ctx, {
     data: data,
     options: options
 });
+
+//for images-labels, consider overloading a drawing function. need to find right one and also modify some internal variables (V?)
+
 
 //cnv.style.height="100px";
 //cnv.style.width="100px";
@@ -229,6 +288,7 @@ function posting() {
   formData.append('spider_file', spider_file);
   formData.append('title', document.getElementById("title").value);
   formData.append('body', document.getElementById("body").value);
+  formData.append('other', document.getElementById("other").value);
 
   fetch('/makeagig', {
     // content-type header should not be specified!
