@@ -6,7 +6,7 @@
 
 
 
-from flask import Flask, redirect, render_template, render_template_string,request, url_for
+from flask import Flask, redirect, render_template, render_template_string,request, url_for,jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 import datetime
@@ -116,7 +116,35 @@ def gig(gignumber):
             return render_template("gig.html", gig=gig.id, comboloc=comboloc,spiderloc=spiderloc,maploc=maploc,title=gig.title, text=gig.body.replace("#","").replace("\n","</p><p>"), words=" ".join(getkeywords(gig.body)),other=gig.other.replace("\n","</p><p>") )
         return render_template_string("no_such_gig #"+str(gig))
 
+@app.route('/gigtest/<gignumber>', methods=["GET"])
+def gigtest(gignumber):
+    if request.method == "GET":
+        gig=Gigs.query.filter_by(id = int(gignumber)).first()
+        if(gig):
+            spiderloc=url_for('static',filename=str(gig.id)+"spider"+".png")
+            maploc=url_for('static',filename=str(gig.id)+"map"+".png")
+            comboloc=url_for('static',filename=str(gig.id)+"combo"+".png")
+            print(spiderloc,maploc,comboloc);
+            if not os.path.exists(preamble+comboloc):
+                files=[preamble+spiderloc,preamble+maploc]
+                images = list(map(Image.open, files))
+                combo_1 = append_images(images, direction='horizontal')
+                combo_1.save(preamble+comboloc)
+            return render_template("gigtest.html", gig=gig.id, comboloc=comboloc,spiderloc=spiderloc,maploc=maploc,title=gig.title, text=gig.body.replace("#","").replace("\n","</p><p>"), words=" ".join(getkeywords(gig.body)),other=gig.other.replace("\n","</p><p>") )
+        return render_template_string("no_such_gig #"+str(gig))
 
+@app.route('/roamme', methods=["post"])
+def makeroampreview():
+    c = Gigs(body=request.form["topleft"],title=request.form["h1"],other=request.form["roam_url"])
+    db.session.add(c)
+    db.session.commit()
+    return jsonify(c.id)
+
+@app.route('/roampreview/<id>', methods=["get"])
+def showroampreview(id):
+    roam=Gigs.query.filter_by(id = int(id)).first()
+
+    return render_template("roampreview.html", title=roam.title, description=roam.body,roam_url=roam.other)
 
 
 def append_images(images, direction='horizontal',

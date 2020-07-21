@@ -1,0 +1,31 @@
+<html>
+<!-— facebook open graph tags -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://https://showgig.pythonanywhere.com/gig/{{gig}}" />
+<meta property="og:title" content="{{words}}" />
+<meta property="og:description" content="{{text}}" />
+<meta property="og:image" content="{{comboloc}}" />
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:domain" content="showgig.pythonanywhere.com" />
+<meta name="twitter:title" content="{{words}}" />
+<meta name="twitter:description" content="{{text}}" />
+<meta name="twitter:image" content="{{comboloc}}" />
+<meta name="twitter:url" content="https://https://showgig.pythonanywhere.com/gig/{{gig}}" />
+<meta http-equiv = "refresh" content = "2; url = https://www.tutorialspoint.com" />
+
+<!--
+<meta name="twitter:label1" value="Opens in Theaters" />
+<meta name="twitter:data1" value="December 1, 2015" />
+<meta name="twitter:label2" value="Or on demand" />
+<meta name="twitter:data2" value="at Hulu.com" /> -->
+
+<img src="{{spiderloc}}" alt="no spider">
+<img src="{{maploc}}" alt="no map">
+<div id='title'><h3>title</h3>{{title}}</div>
+<div id='text'><h3>description</h3><p>{{text | safe}}</p></div>
+<div id='other'><h3>other information</h3><p>{{other | safe}}</p></div>
+<div id='keywords'><h3>keywords</h3> <b>{{words}}</b></div>
+<br>
+<a href='/'>Home page of ShowGig</a>
+</html>
