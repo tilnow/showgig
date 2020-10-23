@@ -1,5 +1,5 @@
 
-# reusing the bones of knewit to build a system that generates gig pages
+# reusing the bones of knewit to build a system that generates gig pages and roam unfurls
 #
 
 
@@ -8,6 +8,7 @@
 
 from flask import Flask, redirect, render_template, render_template_string,request, url_for,jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS, cross_origin
 
 import datetime
 from datetime import timedelta
@@ -18,6 +19,8 @@ from PIL import Image
 import re
 
 app = Flask(__name__)
+CORS(app)#, resources={r"/*": {"origins": "*"}})
+
 app.config["DEBUG"] = True
 
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
@@ -134,8 +137,10 @@ def gigtest(gignumber):
         return render_template_string("no_such_gig #"+str(gig))
 
 @app.route('/roamme', methods=["post"])
+@cross_origin()
 def makeroampreview():
-    c = Gigs(body=request.form["topleft"],title=request.form["h1"],other=request.form["roam_url"])
+    b=request.form["topleft"].replace("ArtOfGig","Yak Collective | Roam")
+    c = Gigs(body=b,title=request.form["h1"],other=request.form["roam_url"])
     db.session.add(c)
     db.session.commit()
     return jsonify(c.id)
