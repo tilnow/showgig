@@ -151,6 +151,12 @@ def showroampreview(id):
 
     return render_template("roampreview.html", title=roam.title, description=roam.body,roam_url=roam.other)
 
+@app.route('/roampreview1/<id>', methods=["get"])
+def showroampreview1(id):
+    roam=Gigs.query.filter_by(id = int(id)).first()
+
+    return render_template("roampreview1.html", title=roam.title, description=roam.body,roam_url=roam.other)
+
 
 def append_images(images, direction='horizontal',
                   bg_color=(255,255,255), aligment='center'):
