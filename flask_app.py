@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 import os
 from PIL import Image
 import re
-load_dotenv() #need to install on bash console pip install python-dotenv .env file is in home directory
+load_dotenv() #need to install on bash console pip3.7 install python-dotenv .env file is in home directory
 app = Flask(__name__)
 CORS(app)#, resources={r"/*": {"origins": "*"}})
 
