@@ -13,11 +13,12 @@ from flask_cors import CORS, cross_origin
 import datetime
 from datetime import timedelta
 import random
+from dotenv import load_dotenv
 
 import os
 from PIL import Image
 import re
-
+load_dotenv()
 app = Flask(__name__)
 CORS(app)#, resources={r"/*": {"origins": "*"}})
 
@@ -25,7 +26,7 @@ app.config["DEBUG"] = True
 
 SQLALCHEMY_DATABASE_URI = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
     username="showgig",
-    password="leaveagig",
+    password=os.environ.get("DBPASS"),
     hostname="showgig.mysql.pythonanywhere-services.com",
     databasename="showgig$default",
 )
